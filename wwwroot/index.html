@@ -6,10 +6,12 @@
 -->
 <html lang="el-GR">
 <head>
-	<title>Dimension by HTML5 UP</title>
+	<title>Otto Assitance</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="assets/css/main.css" />
+	<!-- FontAwesome for icons -->
+	<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
 	<!-- Logo Overlay CSS -->
@@ -20,7 +22,7 @@
 			top: 0; left: 0;
 			width: 100vw;
 			height: 100vh;
-			background: #111;
+			background: transparent;
 			display: flex;
 			z-index: 9999;
 			overflow: hidden;
@@ -40,7 +42,7 @@
 			position: absolute;
 			top: 0; left: 0;
 			width: 100%; height: 100%;
-			background: url('images/logo-2.jpg') center center no-repeat;
+			background: url('images/row-1-column-1.jpg') center center no-repeat;
 			background-size: cover;
 			transition: transform 1s ease-in-out;
 		}
@@ -50,7 +52,7 @@
 			position: absolute;
 			top: 0; left: 0;
 			width: 100%; height: 100%;
-			background: url('images/logo.jpg') center center no-repeat;
+			background: url('images/row-1-column-2.jpg') center center no-repeat;
 			background-size: cover;
 			transition: transform 1s ease-in-out;
 		}
@@ -84,40 +86,345 @@
 <div id="wrapper">
 	<!-- Header -->
 	<header id="header">
-		<div class="logo"><span class="icon fa-gem"></span></div>
+		<!--LOGO HERE-->
+		<div class="logo">
+			<img src="images/logo.png"
+				 alt="Otto Assistance Logo"
+				 style="width:350px; height:auto; border:1px solid white; border-radius:50px;" />
+
+		</div>
 		<div class="content">
 			<div class="inner">
-				<h1>Dimension</h1>
-				<p>A fully responsive site template designed by <a href="https://html5up.net">HTML5 UP</a> and released<br />
-					for free under the <a href="https://html5up.net/license">Creative Commons</a> license.</p>
+				<h1>Η δικιά σας οδική βοήθεια</h1>
+				<p style="text-transform: lowercase;">...πάντα και παντού!</p>
 			</div>
 		</div>
 		<nav>
 			<ul>
-				<li><a href="#intro">Intro</a></li>
-				<li><a href="#work">Work</a></li>
-				<li><a href="#about">About</a></li>
-				<li><a href="#contact">Contact</a></li>
+				<li><a href="#about">Ποιοί Είμαστε</a></li>
+				<li><a href="#intro">Gallery</a></li>
+				<li><a href="#work">Υπηρεσίες</a></li>
+				<li><a href="#contact">Πού θα μας βρείτε</a></li>
 			</ul>
 		</nav>
 	</header>
 
 	<!-- Main -->
 	<div id="main">
+	
+
 		<!-- Intro -->
 		<article id="intro">
-			<h2 class="major">Intro</h2>
-			<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
-			<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. By the way, check out my <a href="#work">awesome work</a>.</p>
-			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dapibus rutrum facilisis...</p>
+			<h2 class="major" style="text-align: center;">Gallery</h2>
+
+			<div class="gallery" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; justify-items: center; align-items: center;">
+				<!-- Video 1 -->
+				<video
+						src="/videos/v1.mp4"
+						poster="images/pic1.jpg"
+						style="max-width: 100%; height: auto;"
+						muted
+						loop
+						controls
+						controlsList="nodownload">
+				</video>
+
+				<!-- Example clickable image -->
+				<img src="images/pic8.jpg" alt="Image 8" class="popup-img" style="width:100%; aspect-ratio: 4/3; object-fit: cover;">
+				<img src="images/pic9.jpg" alt="Image 9" class="popup-img" style="width:100%; aspect-ratio: 4/3; object-fit: cover;">
+				<img src="images/pic10.jpg" alt="Image 10" class="popup-img" style="width:100%; aspect-ratio: 4/3; object-fit: cover;">
+				<!-- Add more images as needed -->
+
+			</div>
 		</article>
 
+		<div id="img-popup" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+">
+
+			<!-- Close Button -->
+			<button id="popup-close" style="
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        width: 50px;
+        height: 50px;
+        font-size: 30px;
+        color: white;
+        background: rgba(0,0,0,0.6);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        outline: none;
+    ">&times;</button>
+
+			<!-- Left Arrow -->
+			<button id="popup-prev" style="
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 50px;
+        color: white;
+        background: rgba(0,0,0,0.6);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+    ">&#10094;</button>
+
+			<!-- Right Arrow -->
+			<button id="popup-next" style="
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 50px;
+        color: white;
+        background: rgba(0,0,0,0.6);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+    ">&#10095;</button>
+
+			<!-- Image -->
+			<img id="popup-img" src="" style="max-width: 90%; max-height: 90%; border: 3px solid white; border-radius: 50px;">
+		</div>
+
+		<script>
+			const popup = document.getElementById('img-popup');
+			const popupImg = document.getElementById('popup-img');
+			const closeBtn = document.getElementById('popup-close');
+			const prevBtn = document.getElementById('popup-prev');
+			const nextBtn = document.getElementById('popup-next');
+
+			const media = Array.from(document.querySelectorAll('.popup-img'));
+			let currentIndex = 0;
+			let popupVideo = null; // track dynamically added video in popup
+
+			// Open popup when clicking an image or video
+			media.forEach((el, index) => {
+				el.addEventListener('click', () => {
+					popup.style.display = 'flex';
+					currentIndex = index;
+
+					// Remove any previous popup video
+					if (popupVideo) {
+						popupVideo.remove();
+						popupVideo = null;
+					}
+
+					if (el.tagName === 'IMG') {
+						popupImg.src = el.src;
+						popupImg.style.display = 'block';
+					} 
+				});
+			});
+
+			// Navigate to previous media
+			prevBtn.addEventListener('click', e => {
+				e.stopPropagation();
+				currentIndex = (currentIndex - 1 + media.length) % media.length;
+				showMedia(currentIndex);
+			});
+
+			// Navigate to next media
+			nextBtn.addEventListener('click', e => {
+				e.stopPropagation();
+				currentIndex = (currentIndex + 1) % media.length;
+				showMedia(currentIndex);
+			});
+
+			// Close popup
+			closeBtn.addEventListener('click', e => {
+				e.stopPropagation();
+				popup.style.display = 'none';
+				if (popupVideo) {
+					popupVideo.pause();  // stop playback
+					document.querySelector('.gallery').appendChild(popupVideo); // move it back
+					popupVideo = null;
+				}
+			});
+
+			// Close popup when clicking outside the image/video
+			popup.addEventListener('click', e => {
+				e.stopPropagation();
+				if (e.target === popup) {
+					popup.style.display = 'none';
+					if (popupVideo) {
+						popupVideo.remove();
+						popupVideo = null;
+					}
+				}
+			});
+
+			// Function to show media by index
+			function showMedia(index) {
+				const el = media[index];
+
+				if (popupVideo) {
+					popupVideo.remove();
+					popupVideo = null;
+				}
+
+				if (el.tagName === 'IMG') {
+					popupImg.src = el.src;
+					popupImg.style.display = 'block';
+				} else if (el.tagName === 'VIDEO') {
+					popupImg.style.display = 'none';
+					popupVideo = document.createElement('video');
+					popupVideo.src = el.src;
+					popupVideo.poster = el.poster;
+					popupVideo.controls = true;
+					popupVideo.autoplay = true;
+					popupVideo.muted = el.muted;
+					popupVideo.loop = el.loop;
+					popupVideo.style.maxWidth = '90%';
+					popupVideo.style.maxHeight = '90%';
+					popup.appendChild(popupVideo);
+				}
+			}
+		</script>
+
+
+
+		<script>
+			const videos = document.querySelectorAll('video');
+
+			videos.forEach(video => {
+				video.addEventListener('play', () => {
+					videos.forEach(v => {
+						if (v !== video) {
+							v.pause(); // pause all other videos
+						}
+					});
+				});
+			});
+		</script>
+
+
 		<!-- Work -->
-		<article id="work">
-			<h2 class="major">Work</h2>
-			<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
-			<p>Adipiscing magna sed dolor elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac...</p>
+		<article id="work" class="container py-5">
+			<h2 class="text-center mb-5 text-primary">Υπηρεσίες Οδικής Βοήθειας</h2>
+
+			<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Ρύθμιση οχήματος / Φορτηγού</h5>
+							<p class="card-text">Άμεση ρυμούλκηση για κάθε όχημα ή φορτηγό.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Ρύθμιση αυτοκινήτου</h5>
+							<p class="card-text">Γρήγορη και ασφαλής βοήθεια για αυτοκίνητα.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Αντικατάσταση μπαταρίας</h5>
+							<p class="card-text">Άμεση αντικατάσταση ή φόρτιση μπαταρίας.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Υπηρεσία μπαταρίας</h5>
+							<p class="card-text">Έλεγχος και επαναφόρτιση μπαταριών στο σημείο.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Παράδοση καυσίμου</h5>
+							<p class="card-text">Βενζίνη ή πετρέλαιο γρήγορα στον τόπο ανάγκης.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Τοπική & Μεταφορά μεγάλων αποστάσεων</h5>
+							<p class="card-text">Μεταφέρουμε οχήματα ασφαλώς, κοντά ή μακριά.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Ρύθμιση μοτοσυκλέτας / Ειδικών οχημάτων</h5>
+							<p class="card-text">Υπηρεσίες ρυμούλκησης για μοτοσυκλέτες και ειδικά οχήματα.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Αλλαγή ελαστικού / Τροχού</h5>
+							<p class="card-text">Άμεση αλλαγή ή επισκευή ελαστικών στο σημείο.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Οδική Βοήθεια στην Αθήνα / Αττική</h5>
+							<p class="card-text">Άμεση βοήθεια σε όλη την Αθήνα και Αττική.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<h5 class="card-title">Οδική Βοήθεια Otto / 24/7 χωρίς συμβόλαιο</h5>
+							<p class="card-text">Εξειδικευμένη βοήθεια διαθέσιμη οποιαδήποτε ώρα, χωρίς συμβόλαιο.</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</article>
+
+		
+
+
 
 		<!-- About -->
 		<article id="about">
@@ -126,35 +433,37 @@
 			<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit...</p>
 		</article>
 
-		<!-- Contact -->
 		<article id="contact">
-			<h2 class="major">Contact</h2>
-			<form method="post" action="#">
-				<div class="fields">
-					<div class="field half">
-						<label for="name">Name</label>
-						<input type="text" name="name" id="name" />
+			<h2 class="major" style="text-align:center; width:100%; margin-bottom:30px;">Επικοινωνία</h2>
+
+			<div class="contact-container" style="display:flex; flex-wrap:wrap; gap:40px; justify-content:center; align-items:flex-start;">
+
+				<!-- Contact Info -->
+				<div class="contact-info" style="flex:1 1 300px; max-width:400px; text-align:center;">
+					<h3>Μέσα Κοινωνικής Δικτύωσης</h3>
+					<div class="social-links" style="display:flex; justify-content:center; gap:20px; margin-top:15px;">
+						<a href="https://www.instagram.com/ottoassistance/?igsh=MWc0azR1ZHRya3BzMQ%3D%3D" target="_blank" style="color:#E1306C; font-size:32px;"><i class="fab fa-instagram"></i></a>
+						<a href="https://www.facebook.com/p/Otto-Assistance-61553635037438/" target="_blank" style="color:#3b5998; font-size:32px;"><i class="fab fa-facebook-f"></i></a>
+						<a href="https://www.tiktok.com/@dimitriskyrkylis" target="_blank" style="color:#000; font-size:32px;"><i class="fab fa-tiktok"></i></a>
+						<a href="https://www.google.com/search?q=Otto+Assistance" target="_blank" style="color:#4285F4; font-size:32px;"><i class="fab fa-google"></i></a>
 					</div>
-					<div class="field half">
-						<label for="email">Email</label>
-						<input type="text" name="email" id="email" />
-					</div>
-					<div class="field">
-						<label for="message">Message</label>
-						<textarea name="message" id="message" rows="4"></textarea>
-					</div>
+
+					<h3 style="margin-top:30px;">Email & Τηλέφωνο</h3>
+					<p style="margin:5px 0;"><strong>Email:</strong> <a href="mailto:ottoassistance.gr@gmail.com" style="color:#E1306C; text-decoration:none;">info@ottoassistance.gr</a></p>
+					<p style="margin:5px 0;"><strong>Τηλέφωνο:</strong> <a href="tel:+306936608366" style="color:#4285F4; text-decoration:none;">+30 69 366 08 366</a></p>
+
 				</div>
-				<ul class="actions">
-					<li><input type="submit" value="Send Message" class="primary" /></li>
-					<li><input type="reset" value="Reset" /></li>
-				</ul>
-			</form>
+
+			</div>
 		</article>
+
+	
+
 	</div>
 
 	<!-- Footer -->
 	<footer id="footer">
-		<p class="copyright">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+		<p class="copyright">Υλοποιήθηκε από τον <a href="https://www.linkedin.com/in/panos-kentros-0282011a5/">Πάνο Κέντρο</a></p>
 	</footer>
 </div>
 
