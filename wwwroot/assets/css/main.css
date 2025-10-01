@@ -1107,7 +1107,7 @@ input, select, textarea {
 /* BG */
 
 	#bg {
-		background-image: url("../../images/bg.JPG");
+		background-image: url("../../images/bg_result.webp");
 		background-size: cover;
 		background-position: center;
 		
