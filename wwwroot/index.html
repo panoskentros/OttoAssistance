@@ -25,7 +25,19 @@
 	<link rel="stylesheet" href="assets/css/main.css" />
 
 	<!-- FontAwesome for icons -->
-	<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			if (document.querySelector('#partners') || document.querySelector('#contact')) {
+				const faScript = document.createElement('script');
+				faScript.src = "https://kit.fontawesome.com/a076d05399.js";
+				faScript.crossOrigin = "anonymous";
+				document.body.appendChild(faScript);
+			}
+		});
+	</script>
+
+	
+	
 	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
 	
@@ -220,6 +232,7 @@
 						muted
 						loop
 						controls
+						preload="none"
 						controlsList="nodownload">
 				</video>
 
@@ -403,20 +416,7 @@
 		</script>
 
 
-
-		<script>
-			const videos = document.querySelectorAll('video');
-
-			videos.forEach(video => {
-				video.addEventListener('play', () => {
-					videos.forEach(v => {
-						if (v !== video) {
-							v.pause(); // pause all other videos
-						}
-					});
-				});
-			});
-		</script>
+		
 
 
 		<!-- Work -->
