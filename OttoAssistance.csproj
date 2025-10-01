@@ -55,10 +55,6 @@
       <None Include="wwwroot\assets\webfonts\fa-solid-900.woff" />
       <None Include="wwwroot\assets\webfonts\fa-solid-900.woff2" />
       <None Include="wwwroot\images\bg.jpg" />
-      <None Include="wwwroot\images\overlay.png" />
-      <None Include="wwwroot\images\pic01.jpg" />
-      <None Include="wwwroot\images\pic02.jpg" />
-      <None Include="wwwroot\images\pic03.jpg" />
       <None Include="wwwroot\index.html" />
     </ItemGroup>
 
