@@ -39,12 +39,60 @@
 	
 	
 	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-
 	
+	<!--Sweet Alert-->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-
+	<script>
 	
+	document.addEventListener("DOMContentLoaded", () => {
+			const form = document.getElementById("offerForm");
+
+			form.addEventListener("submit", async e => {
+				e.preventDefault(); // prevents navigation
+				e.stopPropagation();
+
+				const data = new FormData(form);
+
+				try {
+					const response = await fetch("/submit", {
+						method: "POST",
+						body: data
+					});
+					const result = await response.json();
+
+					if (result.success) {
+						Swal.fire({
+							icon: 'success',
+							title: 'Επιτυχία!',
+							text: result.message,
+							confirmButtonColor: '#097969',
+						});
+						form.reset();
+					} else {
+						Swal.fire({
+							icon: 'error',
+							title: 'Σφάλμα!',
+							text: result.message,
+							confirmButtonColor: '#d33',
+						});
+					}
+				} catch (err) {
+					console.error(err);
+					Swal.fire({
+						icon: 'error',
+						title: 'Σφάλμα!',
+						text: "Κάτι πήγε στραβά. Δοκιμάστε ξανά.",
+						confirmButtonColor: '#d33',
+					});
+				}
+			});
+		});
+	</script>
+
+
+
+
 	<!-- Scrolling Banner CSS -->
 	<style>
 		/* Scrolling Banner Bar */
@@ -202,8 +250,25 @@
 		</div>
 		<div class="content">
 			<div class="inner">
-				<h1 style="font-family: Montserrat, serif">Η δικιά σας οδική βοήθεια</h1>
+				<h1 style="font-family: Montserrat, serif">Η δική σας οδική βοήθεια</h1>
 				<p style="text-transform: lowercase;">...πάντα και παντού!</p>
+				<a href="#offer"
+				   style="
+				   color: white;
+				   text-decoration: none;
+				   padding: 12px 25px;
+				   border-radius: 8px;
+				   display: inline-block;
+				   border: 2px solid white;
+				   background: rgba(255, 255, 255, 0.1);
+				   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+				   font-weight: bold;
+				   font-size: 1.1rem;
+				   transition: all 0.3s ease;"	
+				   onmouseover="this.style.background='white'; this.style.color='black'; this.style.transform='scale(1.05)';"
+				   onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='white'; this.style.transform='scale(1)';">
+					Πάρτε προσφορά
+				</a>
 			</div>
 		</div>
 		<nav>
@@ -516,8 +581,18 @@
 			</div>
 		</article>
 
-		
 
+		<!--Offer-->
+		<article id="offer">
+			<h2 class="major">Προσφορά</h2>
+			<form id="offerForm">
+				<input type="text" name="name" placeholder="Όνομα" required>
+				<input type="email" name="email" placeholder="Email" required>
+				<textarea name="message" placeholder="Μήνυμα" rows="4"></textarea>
+				<button type="submit">Αποστολή</button>
+				<div id="successMessage" style="display:none; color:green; margin-top:10px;"></div>
+			</form>
+		</article>
 
 
 		<!-- About -->
