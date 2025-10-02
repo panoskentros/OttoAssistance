@@ -36,21 +36,24 @@ app.MapPost("/submit", async (HttpContext context) =>
         var smtpClient = new SmtpClient("smtp.gmail.com")
         {
             Port = 587, 
-            Credentials = new NetworkCredential("panoskentros", "mrtc pcdn kpmu mvsm"),
+            //Credentials = new NetworkCredential("panoskentros", "mrtc pcdn kpmu mvsm"),
+            Credentials = new NetworkCredential("ottoassistance.info@gmail.com", "zmjz johu xfqk dxyo"),
             EnableSsl = true,
         };
 
         // Create the email
         var mailMessage = new MailMessage
         {
-            From = new MailAddress("panoskentros@gmail.com", "Otto Assistance TEST"),
+            //From = new MailAddress("panoskentros@gmail.com", "Otto Assistance TEST"),
+            From = new MailAddress("ottoassistance.info@gmail.com", "Otto Assistance"),
             Subject = "Προσφορά",
-            Body = $"Γεία σου: {name}!!\nΣου δίνουμε προσφορά 10% με κωδικό :  για την εταιρεία :",
+            Body = $"Γεία σου: {name}!!\nΛάβε κωδικό με έκπτωση 10% για να το χρησιμοποιήσεις για μεταφορά ή ασφαλιστική κάλυψη.",
             IsBodyHtml = false,
         };
 
         // Recipient
-        mailMessage.To.Add(email); // where you want to receive emails
+        mailMessage.To.Add(email);
+        //mailMessage.To.Add("jkirkilis@gmail.com");
 
         // Send email
         await smtpClient.SendMailAsync(mailMessage);
