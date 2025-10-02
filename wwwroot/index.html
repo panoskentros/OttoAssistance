@@ -24,17 +24,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="assets/css/main.css" />
 
-	<!-- FontAwesome for icons -->
-	<script>
-		document.addEventListener('DOMContentLoaded', () => {
-			if (document.querySelector('#partners') || document.querySelector('#contact')) {
-				const faScript = document.createElement('script');
-				faScript.src = "https://kit.fontawesome.com/a076d05399.js";
-				faScript.crossOrigin = "anonymous";
-				document.body.appendChild(faScript);
-			}
-		});
-	</script>
+	
 
 	
 	
@@ -90,6 +80,118 @@
 		});
 	</script>
 
+	<!--Carousel CSS and JS-->
+	<style>
+		/* Carousel Container */
+		.carousel-container {
+			position: relative;
+			max-width: 100%;
+			margin: 0 auto;
+			overflow: hidden;
+		}
+
+		/* Slide Wrapper */
+		.carousel-slide {
+			display: flex;
+			transition: transform 0.5s ease-in-out;
+		}
+
+		/* Individual Slides */
+		.carousel-slide img,
+		.carousel-slide video {
+			width: 100%;
+			max-width: 100%;
+			height: auto;
+			flex-shrink: 0;
+			border-radius: 15px;
+			margin-right: 10px;
+		}
+
+		/* Navigation Buttons */
+		.carousel-container .prev,
+		.carousel-container .next {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 2rem;
+			background: transparent;
+			color: #fff;
+			border: none;
+			border-radius: 40%;
+			width: 50px;
+			height: 50px;
+			cursor: pointer;
+			z-index: 10;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.carousel-container .prev:hover,
+		.carousel-container .next:hover {
+			background: rgba(0,0,0,0.2);
+		}
+
+		.carousel-container .prev {
+			left: 10px;
+		}
+
+		.carousel-container .next {
+			right: 10px;
+		}
+		
+	</style>
+	
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const carouselSlide = document.querySelector('.carousel-slide');
+			const slides = Array.from(carouselSlide.children);
+			const prevBtn = document.querySelector('.prev');
+			const nextBtn = document.querySelector('.next');
+
+			let index = 0;
+
+			// calculate slide width including margin
+			function getSlideWidth() {
+				const style = window.getComputedStyle(slides[0]);
+				const margin = parseFloat(style.marginRight);
+				return slides[0].offsetWidth + margin;
+			}
+
+			function moveToSlide(idx) {
+				const slideWidth = getSlideWidth();
+				carouselSlide.style.transform = `translateX(-${slideWidth * idx}px)`;
+			}
+
+			nextBtn.addEventListener('click', () => {
+				index = (index + 1) % slides.length;
+				moveToSlide(index);
+			});
+
+			prevBtn.addEventListener('click', () => {
+				index = (index - 1 + slides.length) % slides.length;
+				moveToSlide(index);
+			});
+
+			// Auto-slide every 5 seconds, but pause if current slide is playing video
+			setInterval(() => {
+				const currentSlide = slides[index];
+
+				// If current slide is a video and it's playing, skip auto-slide
+				if (currentSlide.tagName === 'VIDEO' && !currentSlide.paused) {
+					return; // skip this interval
+				}
+
+				// Otherwise, move to next slide
+				index = (index + 1) % slides.length;
+				moveToSlide(index);
+			}, 5000);
+
+			// Make carousel responsive on window resize
+			window.addEventListener('resize', () => moveToSlide(index));
+		});
+
+	</script>
 
 
 
@@ -143,34 +245,58 @@
 		}
 
 		/* Push the rest of the page content down so it doesn’t hide under banner */
-		body {
-			padding-top: 40px;
+		
+		@media screen and (max-width: 800px) {
+			body {
+				padding-top: 40px;
+			}
 		}
+		
 
 	</style>
 	
 	<!-- Logo Overlay CSS -->
 	<style>
-		/* Full-screen overlay */
+		/* Left and right halves of black background */
+		#logo-bg-left,
+		#logo-bg-right {
+			position: fixed;
+			top: 0;
+			width: 50vw;    /* Half of viewport width */
+			height: 100vh;  /* Full viewport height */
+			background: rgba(0, 0, 0, 0.4); /* semi-transparent so blur shows */
+			z-index: 9998;  /* Behind overlay */
+
+			/* Blur the background behind */
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(20px); /* Safari support */
+		}				
+		<!---->
 		#logo-overlay {
 			position: fixed;
-			top: 0; left: 0;
-			width: 50%;
-			height: 50%;
-			background:transparent;
+			top: 50%;
+			left: 50%;
+			width: 50vw;    /* Half of viewport width */
+			height: 50vh;   /* Half of viewport height */
+			transform: translate(-50%, -50%); /* Center it */
+			background: transparent;
+			opacity: 0.85;
 			display: flex;
 			z-index: 9999;
 			overflow: hidden;
-			
+			border-radius: 2rem;
 		}
 
 		/* Left and right halves */
 		#logo-left, #logo-right {
 			position: relative;
-			width: 50vw;
-			height: 100vh;
+			width: 50%;   /* Split overlay horizontally */
+			height: 100%;
 			overflow: hidden;
 		}
+		/* Positioning each half */
+		#logo-bg-left { left: 0; }
+		#logo-bg-right { right: 0; }
 
 		/* Logo images inside each half */
 		#logo-left::before {
@@ -191,21 +317,55 @@
 			background: url('images/white_logo_without_assistance_2_result.webp') center center no-repeat;
 			background-size: cover;
 			transition: transform 1s ease-in-out;
+			opacity: 1;
 		}
-		@media (max-width: 1024px) {
-			#logo-left, #logo-right { width: 50vw; height: 100vh; }
-		}
-
-		@media (max-width: 768px) {
-			#logo-left, #logo-right { width: 50vw; height: 100vh; }
+		#logo-left::before, #logo-right::before {
+			transition: transform 1s ease-in-out; /* 1s duration */
 		}
 
-		@media (max-width: 480px) {
-			#logo-left, #logo-right { width: 50vw; height: 100vh; }
+		/* Background halves (full screen, move farther) */
+		#logo-bg-left, #logo-bg-right {
+			transition: transform 1.5s ease-in-out; /* 2s = distance ratio x logo duration */
 		}
 		/* Split animation */
 		#logo-overlay.split #logo-left::before { transform: translateX(-100%); }
 		#logo-overlay.split #logo-right::before { transform: translateX(100%); }
+		/* Split animation for background */
+		#logo-bg-left.split {
+			transform: translateX(-100%);
+		}
+
+		#logo-bg-right.split {
+			transform: translateX(100%);
+		}
+		@media (max-width: 800px) {
+			/* Hide background halves */
+			#logo-bg-left, #logo-bg-right {
+				display: none;
+			}
+
+			#logo-overlay {
+				flex-direction: column; /* stack vertically */
+				width: 100vw; 
+				height: 100vh;
+				opacity:1;
+			}
+
+			#logo-left, #logo-right {
+				width: 100%;
+				height: 100%;  /* each half takes half overlay height */
+			}
+
+			/* Top goes left, bottom goes right */
+			#logo-overlay.split #logo-left::before { transform: translateX(-100%); }
+			#logo-overlay.split #logo-right::before { transform: translateX(100%); }
+
+			/* Make images cover 100% width and 50% height */
+			#logo-left::before, #logo-right::before {
+				width: 100%;
+				height: 100%;
+			}
+		}
 	</style>
 	
 
@@ -217,6 +377,8 @@
 <body class="is-preload">
 
 <!-- Logo Overlay -->
+<div id="logo-bg-left"></div>
+<div id="logo-bg-right"></div>
 <div id="logo-overlay">
 	<div id="logo-left"></div>
 	<div id="logo-right"></div>
@@ -277,7 +439,6 @@
 				<li><a href="#intro">Gallery</a></li>
 				<li><a href="#work">Υπηρεσίες</a></li>
 				<li><a href="#contact">Πού θα μας βρείτε</a></li>
-				<li><a href="#partners">Συνεργάτες</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -288,197 +449,36 @@
 		<article id="intro">
 			<h2 class="major" style="text-align: center;">Gallery</h2>
 
-			<div class="gallery" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; justify-items: center; align-items: center;">
-				<!-- Video 1 -->
-				<video
-						src="/videos/v1.mp4"
-						poster="images/pic1_result.webp"
-						style="max-width: 100%; height: auto;"
-						muted
-						loop
-						controls
-						preload="none"
-						controlsList="nodownload">
-				</video>
+			<div class="carousel-container">
+				<div class="carousel-slide">
+					<!-- Video Slide -->
+					<video
+							src="/videos/v1.mp4"
+							poster="images/pic9_poster.webp"
+							muted
+							loop
+							controls
+							preload="none"
+							controlsList="nodownload"
+							style="width:100%; height:auto;"
+					></video>
 
-				<!-- Example clickable image -->
-				<img loading="lazy" src="images/pic8_result.webp" alt="Image 8" class="popup-img" style="width:100%; aspect-ratio: 4/3; object-fit: cover;">
-				<img loading="lazy" src="images/pic9_result.webp" alt="Image 9" class="popup-img" style="width:100%; aspect-ratio: 4/3; object-fit: cover;">
-				<img loading="lazy" src="images/pic10_result.webp" alt="Image 10" class="popup-img" style="width:100%; aspect-ratio: 4/3; object-fit: cover;">
-				<!-- Add more images as needed -->
+					<!-- Image Slides -->
+					<img loading="lazy" src="images/pic8_result.webp" alt="Image 8">
+					<img loading="lazy" src="images/pic9_result.webp" alt="Image 9">
+					<img loading="lazy" src="images/pic10_result.webp" alt="Image 10">
+					<!-- Add more images as needed -->
+				</div>
 
+				<!-- Navigation -->
+				<button class="prev">&#10094;</button>
+				<button class="next">&#10095;</button>
 			</div>
 		</article>
 
-		<div id="img-popup" style="
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-">
+	
 
-			<!-- Close Button -->
-			<button id="popup-close" style="
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        width: 50px;
-        height: 50px;
-        font-size: 30px;
-        color: white;
-        background: rgba(0,0,0,0.6);
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1001;
-        outline: none;
-    ">&times;</button>
-
-			<!-- Left Arrow -->
-			<button id="popup-prev" style="
-        position: absolute;
-        left: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 50px;
-        color: white;
-        background: rgba(0,0,0,0.6);
-        border: none;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1001;
-    ">&#10094;</button>
-
-			<!-- Right Arrow -->
-			<button id="popup-next" style="
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 50px;
-        color: white;
-        background: rgba(0,0,0,0.6);
-        border: none;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1001;
-    ">&#10095;</button>
-
-			<!-- Image -->
-			<img id="popup-img" src="" style="max-width: 90%; max-height: 90%; border: 3px solid white; border-radius: 50px;">
-		</div>
-
-		<script>
-			const popup = document.getElementById('img-popup');
-			const popupImg = document.getElementById('popup-img');
-			const closeBtn = document.getElementById('popup-close');
-			const prevBtn = document.getElementById('popup-prev');
-			const nextBtn = document.getElementById('popup-next');
-
-			const media = Array.from(document.querySelectorAll('.popup-img'));
-			let currentIndex = 0;
-			let popupVideo = null; // track dynamically added video in popup
-
-			// Open popup when clicking an image or video
-			media.forEach((el, index) => {
-				el.addEventListener('click', () => {
-					popup.style.display = 'flex';
-					currentIndex = index;
-
-					// Remove any previous popup video
-					if (popupVideo) {
-						popupVideo.remove();
-						popupVideo = null;
-					}
-
-					if (el.tagName === 'IMG') {
-						popupImg.src = el.src;
-						popupImg.style.display = 'block';
-					} 
-				});
-			});
-
-			// Navigate to previous media
-			prevBtn.addEventListener('click', e => {
-				e.stopPropagation();
-				currentIndex = (currentIndex - 1 + media.length) % media.length;
-				showMedia(currentIndex);
-			});
-
-			// Navigate to next media
-			nextBtn.addEventListener('click', e => {
-				e.stopPropagation();
-				currentIndex = (currentIndex + 1) % media.length;
-				showMedia(currentIndex);
-			});
-
-			// Close popup
-			closeBtn.addEventListener('click', e => {
-				e.stopPropagation();
-				popup.style.display = 'none';
-				if (popupVideo) {
-					popupVideo.pause();  // stop playback
-					document.querySelector('.gallery').appendChild(popupVideo); // move it back
-					popupVideo = null;
-				}
-			});
-
-			// Close popup when clicking outside the image/video
-			popup.addEventListener('click', e => {
-				e.stopPropagation();
-				if (e.target === popup) {
-					popup.style.display = 'none';
-					if (popupVideo) {
-						popupVideo.remove();
-						popupVideo = null;
-					}
-				}
-			});
-
-			// Function to show media by index
-			function showMedia(index) {
-				const el = media[index];
-
-				if (popupVideo) {
-					popupVideo.remove();
-					popupVideo = null;
-				}
-
-				if (el.tagName === 'IMG') {
-					popupImg.src = el.src;
-					popupImg.style.display = 'block';
-				} else if (el.tagName === 'VIDEO') {
-					popupImg.style.display = 'none';
-					popupVideo = document.createElement('video');
-					popupVideo.src = el.src;
-					popupVideo.poster = el.poster;
-					popupVideo.controls = true;
-					popupVideo.autoplay = true;
-					popupVideo.muted = el.muted;
-					popupVideo.loop = el.loop;
-					popupVideo.style.maxWidth = '90%';
-					popupVideo.style.maxHeight = '90%';
-					popup.appendChild(popupVideo);
-				}
-			}
-		</script>
+		
 
 
 		
@@ -583,33 +583,51 @@
 
 
 		<!--Offer-->
-		<article id="offer">
+		<article id="offer" style="text-align: center">
 			<h2 class="major">Προσφορά</h2>
-			<form id="offerForm">
-				<input type="text" name="name" placeholder="Όνομα" required>
-				<input type="email" name="email" placeholder="Email" required>
-				<textarea name="message" placeholder="Μήνυμα" rows="4"></textarea>
-				<button type="submit">Αποστολή</button>
-				<div id="successMessage" style="display:none; color:green; margin-top:10px;"></div>
+			<form id="offerForm" style="text-align: center;">
+				<label for="name" style="font-size:1rem;">Όνομα</label>
+				<input id="name" type="text" name="name" placeholder="Εισάγετε όνομα εδώ"  required style="width: 50%; margin: 0 auto; display: block;">
+
+				<label for="email" style="margin-top:1.5rem; font-size:1rem;">Email</label>
+				<input id="email" type="email" name="email" placeholder="Εισάγετε email εδώ"  required style="width: 50%; margin: 0 auto; display: block;">
+
+				<label for="phone" style="margin-top:1.5rem;font-size:1rem;">Κινητό Τηλέφωνο</label>
+				<input id="phone" type="tel" name="phone" placeholder="Εισάγετε κινητό τηλέφωνο εδώ"  required style="width: 50%; margin: 0 auto; display: block;">
+
+				<button type="submit" style="margin-top: 1.5rem;font-size:1rem;">Αποστολή</button>
 			</form>
 		</article>
 
 
+
 		<!-- About -->
-		<article id="about" ß>
+		<article id="about" style="text-align: center">
 			<h2 class="major">Ποιοί είμαστε</h2>
-			<span class="image main" style="width:90%; height:auto;"><img src="images/logo_withlines.webp" alt="Otto Assistance logo" /></span>
-			<p>
-				Η Otto Assistance διαθέτει τεχνική υποστήριξη, άμεση και αποτελεσματική εξυπηρέτηση για την ασφαλή
-				μεταφορά παντός τύπου οχήματος.<br>
-				Η επαγγελματική μας ευθύνη για κάθε πελάτη ξεχωριστά.<br>
-				Υπόψιν: Μεταφορά και service οχημάτων κατόπιν συνεννοήσεως.
-				<br>Για οποιαδήποτε απορία καλέστε <a href="tel:+30 69 366 08 366" style="color: #4285F4;">69 366 08 366</a>.<br>
+			<div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+				<img src="images/logo_withlines.webp"
+					 alt="Otto Assistance logo"
+					 style="max-width: 100%; max-height: 175px; border:0.5px solid grey; border-radius: 0.25rem;" />
+			</div>
+			<p style="font-size: 1rem; line-height: 1.6;">
+				Η <strong>Otto Assistance</strong> διαθέτει <em>τεχνική υποστήριξη</em>,
+				<strong>άμεση</strong> και <em>αποτελεσματική</em> εξυπηρέτηση για την
+				<u>ασφαλή μεταφορά παντός τύπου οχήματος</u>.<br><br>
+
+				Η <strong>επαγγελματική μας ευθύνη</strong> για κάθε πελάτη ξεχωριστά.<br><br>
+
+				<em>Υπόψιν:</em> <u>Μεταφορά και service οχημάτων κατόπιν συνεννοήσεως</u>.<br><br>
+
+				Για οποιαδήποτε απορία καλέστε
+				<a href="tel:+30 69 366 08 366" style="color: #4285F4; font-weight:bold; text-decoration: underline;">
+					69 366 08 366
+				</a>.<br>
 			</p>
+
 		</article>
 
 		<article id="contact">
-			<h2 class="major" style="text-align:center; width:100%; margin-bottom:30px;">Επικοινωνία</h2>
+			<h2 class="major" style="text-align:center; margin-bottom:30px;">Επικοινωνία</h2>
 
 			<div class="contact-container" style="display:flex; flex-wrap:wrap; gap:40px; justify-content:center; align-items:flex-start;">
 
@@ -671,113 +689,6 @@
 			</div>
 		</article>
 
-		<!--Partners-->
-		<article id="partners">
-			<h2 class="major" style="color:white; text-align:center;">Συνεργάτες</h2>
-
-			<div class="bootstrap-scope" style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-top:20px;">
-
-				<!-- Card 1 -->
-				<div class="card dark-card hover-card" style="width:14rem;">
-					<img class="card-img-top" src="/images/logo_result.webp" alt="Card image cap" loading="lazy">
-					<div class="card-body text-center">
-						<h5 class="card-title">Allianz</h5>
-						<p class="card-text">Άμεση βοήθεια και υποστήριξη σε όλη την Ελλάδα.</p>
-						<a href="https://www.google.com/search?q=Otto+Assistance" target="_blank" style="color:#4285F4; font-size:32px;">
-							<i class="fab fa-google"></i>
-						</a>
-						<a href="https://www.instagram.com/ottoassistance/" target="_blank" style="color:#E1306C; font-size:32px;">
-							<i class="fab fa-instagram"></i>
-						</a>
-						<a href="https://www.tiktok.com/@dimitriskyrkylis" target="_blank" style="color:#000000; font-size:32px;">
-							<i class="fab fa-tiktok"></i>
-						</a>
-						<a href="https://www.facebook.com/p/Otto-Assistance-61553635037438/" target="_blank" style="color:#3b5998; font-size:32px;">
-							<i class="fab fa-facebook-f"></i>
-						</a>
-					</div>
-				</div>
-
-				<!-- Card 2 -->
-				<div class="card dark-card hover-card" style="width:14rem;">
-					<img class="card-img-top" src="/images/interamerican_relust.webp" alt="Card image cap" loading="lazy">
-					<div class="card-body text-center">
-						<h5 class="card-title">Interamerican</h5>
-						<p class="card-text">Γρήγορη ανταπόκριση και υποστήριξη πανελλαδικά.</p>
-						<a href="https://www.interamerican.gr/" target="_blank" style="color:#4285F4; font-size:32px;">
-							<i class="fab fa-google"></i>
-						</a>
-						<a href="https://www.instagram.com/interamericangr/?hl=el" target="_blank" style="color:#E1306C; font-size:32px;" >
-							<i class="fab fa-instagram"></i>
-						</a>
-						<a href="https://www.tiktok.com/@interamericangr" target="_blank" style="color:#000000; font-size:32px;">
-							<i class="fab fa-tiktok"></i>
-						</a>
-						<a href="https://el-gr.facebook.com/Interamerican" target="_blank" style="color:#3b5998; font-size:32px;">
-							<i class="fab fa-facebook-f"></i>
-						</a>
-						<a href="https://x.com/INTERAMERICANGR" target="_blank" style="color:#4285F4; font-size:32px;">
-							<i class="fab fa-twitter"></i>
-						</a>
-						<div style="margin-top:8px;">
-							<a href="https://www.linkedin.com/company/interamerican/" target="_blank" style="color:#0077B5; font-size:32px; margin-right:8px;">
-								<i class="fab fa-linkedin"></i>
-							</a>
-							<a href="https://www.youtube.com/channel/UCJ9YaqTHuXk837QQXmGOenw" target="_blank" style="color:#FF0000; font-size:32px;">
-								<i class="fab fa-youtube"></i>
-							</a>
-						</div>
-					</div>
-				</div>
-
-				<!-- Card 3 -->
-				<div class="card dark-card hover-card" style="width:14rem;">
-					<img class="card-img-top" src="/images/mondial_logo.webp" alt="Card image cap" loading="lazy">
-					<div class="card-body text-center">
-						<h5 class="card-title">Mondial</h5>
-						<p class="card-text">Γρήγορη ανταπόκριση και υποστήριξη πανελλαδικά.</p>
-						<a href="https://www.google.com/search?q=Otto+Assistance" target="_blank" style="color:#4285F4; font-size:32px;">
-							<i class="fab fa-google"></i>
-						</a>
-						<a href="https://www.instagram.com/ottoassistance/" target="_blank" style="color:#E1306C; font-size:32px;">
-							<i class="fab fa-instagram"></i>
-						</a>
-						<a href="https://www.tiktok.com/@dimitriskyrkylis" target="_blank" style="color:#000000; font-size:32px;">
-							<i class="fab fa-tiktok"></i>
-						</a>
-						<a href="https://www.facebook.com/p/Otto-Assistance-61553635037438/" target="_blank" style="color:#3b5998; font-size:32px;">
-							<i class="fab fa-facebook-f"></i>
-						</a>
-					</div>
-				</div>
-
-				<!-- Card 4 -->
-				<div class="card dark-card hover-card" style="width:14rem;">
-					<img class="card-img-top" src="/images/mondial_logo.webp" alt="Card image cap" loading="lazy">
-					<div class="card-body text-center">
-						<h5 class="card-title">Mondial</h5>
-						<p class="card-text">Γρήγορη ανταπόκριση και υποστήριξη πανελλαδικά.</p>
-						<a href="https://www.google.com/search?q=Otto+Assistance" target="_blank" style="color:#4285F4; font-size:32px;">
-							<i class="fab fa-google"></i>
-						</a>
-						<a href="https://www.instagram.com/ottoassistance/" target="_blank" style="color:#E1306C; font-size:32px;">
-							<i class="fab fa-instagram"></i>
-						</a>
-						<a href="https://www.tiktok.com/@dimitriskyrkylis" target="_blank" style="color:#000000; font-size:32px;">
-							<i class="fab fa-tiktok"></i>
-						</a>
-						<a href="https://www.facebook.com/p/Otto-Assistance-61553635037438/" target="_blank" style="color:#3b5998; font-size:32px;">
-							<i class="fab fa-facebook-f"></i>
-						</a>
-					</div>
-				</div>
-				
-				
-			</div>
-		</article>
-		
-	
-
 	</div>
 
 	<!-- Footer -->
@@ -800,11 +711,22 @@
 <script>
 	setTimeout(() => {
 		const overlay = document.getElementById('logo-overlay');
-		overlay.classList.add('split');
+		const bgLeft = document.getElementById('logo-bg-left');
+		const bgRight = document.getElementById('logo-bg-right');
 
-		// Remove overlay after 1s
-		setTimeout(() => overlay.remove(), 1000);
-	}, 2000);
+		// Add split class to overlay AND background halves
+		overlay.classList.add('split');
+		bgLeft.classList.add('split');
+		bgRight.classList.add('split');
+
+		// Remove overlay and background after animation completes
+		setTimeout(() => {
+			overlay.remove();
+			bgLeft.remove();
+			bgRight.remove();
+		}, 1000); // match your CSS transition duration
+	}, 1600); // delay before starting animation
+
 </script>
 </body>
 </html>

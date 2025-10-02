@@ -190,12 +190,9 @@ input, select, textarea {
 
 		h1.major, h2.major, h3.major, h4.major, h5.major, h6.major {
 			border-bottom: solid 1px #ffffff;
-			width: -moz-max-content;
-			width: -webkit-max-content;
-			width: -ms-max-content;
-			width: max-content;
 			padding-bottom: 0.5rem;
 			margin: 0 0 2rem 0;
+			width:100%;
 		}
 
 	h1 {
@@ -1203,9 +1200,10 @@ input, select, textarea {
 		-ms-justify-content: space-between;
 		justify-content: space-between;
 		position: relative;
-		min-height: 100vh;
+		max-height: 90vh;
 		width: 100%;
-		padding: 4rem 2rem;
+		padding: 4rem 1.5rem;
+		margin: 0 0;
 		z-index: 3;
 	}
 
@@ -1640,6 +1638,7 @@ input, select, textarea {
 
 		body.is-article-visible #footer {
 			-moz-transform: scale(0.95);
+			
 			-webkit-transform: scale(0.95);
 			-ms-transform: scale(0.95);
 			transform: scale(0.95);
