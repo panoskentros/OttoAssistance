@@ -21,9 +21,14 @@ section, summary, time, mark, audio, video {
 	margin: 0;
 	padding: 0;
 	border: 0;
+	font: inherit;	
 	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;}
+	vertical-align: baseline;
+	user-select: none; /* Standard syntax */
+	-webkit-user-select: none; /* Chrome, Safari, Opera */
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+}
 
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
@@ -112,7 +117,7 @@ input, select, textarea {
 /* Type */
 
 	html {
-		font-size: 16pt;
+		font-size: 15pt;
 	}
 
 		@media screen and (max-width: 1680px) {
@@ -145,6 +150,7 @@ input, select, textarea {
 		font-weight: 300;
 		font-size: 1rem;
 		line-height: 1.65;
+		
 	}
 
 	a {
@@ -386,6 +392,7 @@ input, select, textarea {
 	input[type="password"],
 	input[type="email"],
 	input[type="tel"],
+	input[type="phone"],
 	select,
 	textarea {
 		-moz-appearance: none;
@@ -404,7 +411,9 @@ input, select, textarea {
 		outline: 0;
 		padding: 0 1rem;
 		text-decoration: none;
-		width: 100%;
+		width: 50%;
+		margin: 0 auto; 
+		height:2.5rem;
 	}
 
 		input[type="text"]:invalid,
@@ -643,7 +652,6 @@ input, select, textarea {
 
 		.image:before {
 			pointer-events: none;
-			background-image: url("../../images/overlay.png");
 			background-color: rgba(19, 21, 25, 0.5);
 			border-radius: 4px;
 			content: '';
@@ -1120,7 +1128,7 @@ input, select, textarea {
 		height: 100vh;
 		z-index: 1;
 	}
-
+	
 		#bg:before, #bg:after {
 			content: '';
 			display: block;
@@ -1140,7 +1148,6 @@ input, select, textarea {
 			-webkit-transition-delay: 0.75s;
 			-ms-transition-delay: 0.75s;
 			transition-delay: 0.75s;
-			background-image: linear-gradient(to top, rgba(19, 21, 25, 0.5), rgba(19, 21, 25, 0.5)), url("../../images/overlay.png");
 			background-size: auto,
  256px 256px;
 			background-position: center,
@@ -1224,6 +1231,9 @@ input, select, textarea {
 
 			#wrapper {
 				padding: 2rem 1rem;
+			}
+			#bg {
+				background-image: url("../../images/bg_result_mobile.webp");
 			}
 
 		}
@@ -1341,24 +1351,29 @@ input, select, textarea {
 		}
 
 			#header nav ul li {
-				padding-left: 0;
-				border-left: solid 1px #ffffff;
+				flex: 1;          /* each item takes equal space */
+				text-align: center; /* center the text */
+				border-left: 1px solid #fff;
+				padding: 0 0;
+				margin: 0 0;
 			}
 
 				#header nav ul li:first-child {
 					border-left: 0;
 				}
-
+				#header nav ul {
+					display: flex;
+				}
 				#header nav ul li a {
 					display: block;
-					min-width: 7.5rem;
+					min-width: 8.5rem;
 					height: 2.75rem;
 					line-height: 2.75rem;
-					padding: 0 1.25rem 0 1.45rem;
 					text-transform: uppercase;
 					letter-spacing: 0.2rem;
-					font-size: 0.8rem;
+					font-size: 0.85rem;
 					border-bottom: 0;
+					text-align: center;
 				}
 
 					#header nav ul li a:hover {
