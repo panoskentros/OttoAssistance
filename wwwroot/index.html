@@ -101,13 +101,11 @@
 		.carousel-slide img,
 		.carousel-slide video {
 			width: 100%;
-			max-width: 100%;
 			height: auto;
-			max-height: 350px;
+			max-height: 240px;
 			flex-shrink: 0;
 			border-radius: 15px;
 			margin-right: 10px;
-			touch-action: pan-x;
 		}
 
 		/* Navigation Buttons */
@@ -142,7 +140,12 @@
 		.carousel-container .next {
 			right: 10px;
 		}
-		
+		@media (max-width: 800px) {
+			.carousel-slide img ,
+			.carousel-slide video {
+				max-height: 50%;
+			}
+		}
 	</style>
 
 	<script>
@@ -196,65 +199,7 @@
 
 
 
-	<!-- Scrolling Banner CSS -->
-	<style>
-		/* Scrolling Banner Bar */
-		.scrolling-banner {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			background: #111; /* dark background */
-			color: #fff;
-			font-size: 18px;
-			font-weight: bold;
-			white-space: nowrap;
-			overflow: hidden;
-			z-index: 9998; /* make sure it’s above everything */
-			height: 40px;
-			display: flex;
-			align-items: center;
-			
-		}
-		.scrolling-banner img {
-			height: 30px;      /* consistent height */
-			max-width: 120px;  /* prevents very wide logos from breaking layout */
-			margin: 0 20px;    /* spacing between logos and text */
-			object-fit: contain; /* preserves aspect ratio */
-
-			--webkit-user-select: none;
-			pointer-events: none;
-		}
-
-		.banner-content {
-			display: inline-block;
-			padding-left: 100%; /* push start off-screen */
-			animation: scroll-left 20s linear infinite;
-			will-change: transform;
-		}
-		.banner-content a {
-			margin-right:20px;
-		}
-
-		.banner-content span {
-			margin-right: 50px; /* spacing between messages */
-		}
-
-		@keyframes scroll-left {
-			0% { transform: translateX(0); }
-			100% { transform: translateX(-60%); }
-		}
-
-		/* Push the rest of the page content down so it doesn’t hide under banner */
-		
-		@media screen and (max-width: 800px) {
-			body {
-				padding-top: 40px;
-			}
-		}
-		
-
-	</style>
+	
 	
 	<!-- Logo Overlay CSS -->
 	<style>
@@ -321,12 +266,12 @@
 			opacity: 1;
 		}
 		#logo-left::before, #logo-right::before {
-			transition: transform 1s ease-in-out; /* 1s duration */
+			transition: transform 1.2s ease-in-out; /* 1s duration */
 		}
 
 		/* Background halves (full screen, move farther) */
 		#logo-bg-left, #logo-bg-right {
-			transition: transform 1.5s ease-in-out; /* 2s = distance ratio x logo duration */
+			transition: transform 1.5s ease-in-out; 
 		}
 		/* Split animation */
 		#logo-overlay.split #logo-left::before { transform: translateX(-100%); }
@@ -339,12 +284,16 @@
 		#logo-bg-right.split {
 			transform: translateX(100%);
 		}
-		@media (max-width: 800px) {
+		@media (max-width: 1025px) {
 			/* Hide background halves */
-			#logo-bg-left, #logo-bg-right {
-				display: none;
+			#logo-left::before, #logo-right::before {
+				transition: transform 1s ease-in-out; /* 1s duration */
 			}
 
+			/* Background halves (full screen, move farther) */
+			#logo-bg-left, #logo-bg-right {
+				transition: transform 1s ease-in-out; 
+			}
 			#logo-overlay {
 				flex-direction: column; /* stack vertically */
 				width: 100vw; 
@@ -355,7 +304,7 @@
 
 			#logo-left, #logo-right {
 				width: 100%;
-				height: 100%;  /* each half takes half overlay height */
+				height: 50%;  /* each half takes half overlay height */
 			}
 
 			/* Top goes left, bottom goes right */
@@ -366,6 +315,8 @@
 			#logo-left::before, #logo-right::before {
 				width: 100%;
 				height: 100%;
+
+				background-size: contain; /* instead of cover */
 			}
 		}
 	</style>
@@ -416,13 +367,182 @@
 
 
 	</style>
+		<style>
+			
+			.scrolling-banner{
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				background: #111; /* dark background */
+				opacity:0.8;
+				color: #fff;
+				font-weight: bold;
+				white-space: nowrap;
+				z-index: 1000; /* make sure it’s above everything */
+				height: 40px;
+				align-items: center;
+				padding:0 0 ;
+				
+				font-size: 15px;
+				padding-block:8px;
+				border:none;
+				display:flex;
+				user-select: none;
+				--gap:20px;
+				gap:var(--gap);
+				overflow: hidden;
+			}
+			.scrolling-banner ul{
+				margin: 0; /* reset default margin */
+				padding: 0; /* reset default padding */
+				
+				list-style: none;
+				flex-shrink: 0;
+				min-width: 100%;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap:var(--gap);
+				animation: scroll 20s linear infinite;
+				
+			}
+		
+			@keyframes scroll{
+				to{
+					transform:translateX(calc(-100% - var(--gap)));
+				}
+			}
+		</style>
+	<style>
+		.logo-disc-container {
+			position: relative;
+			display: inline-block;
+			width: 80%;
+			max-width: 350px;
+			margin: 0 auto;
+			pointer-events: none;
+		}
 
+		/* your logo - keep it as is */
+		.logo-img {
+			width: 100%;
+			height: auto;
+			border: 1px solid white;
+			border-radius: 10px; /* keep your style */
+			opacity: 0.85;
+			display: block;
+		}
 
+		/* wrapper: handles only positioning (translate) */
+		.disc-wrapper {
+			position: absolute;
+			top: 40%;
+			left: 80%;               /* put it in right half — tweak % as needed */
+			transform: translate(-50%, -50%);
+			width: 55px;            
+			height: 55px;  /* else 128px */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			pointer-events: all;    /* allow clicks to pass to .disc only */
+			z-index: 10;             /* sit above the logo */
+		}
+		.disc{
+			width: inherit;
+			height: inherit;
+			background: url(https://moytek.com.tr/wp-content/uploads/disk-hover-effect/s-l1200.png) center;
+		
+			background-size:400px;
+			border-radius: 50%;
+			transition: all 1s;
+			position: relative;
+			z-index: 100000;
+			
+		} .rotating {
+			  animation: rotation 5s linear infinite;
+		  } 
+		.paused {
+				animation-play-state: paused;
+			}
+
+		/* Rotate Animation Keyframes */
+		@keyframes rotation {
+			from {transform: rotate(0deg);}
+			to {transform: rotate(360deg);}
+		}
+		@media (max-width: 800px) {
+			.disc-wrapper {
+				position: absolute;
+				top: 40%;
+				left: 80%;               /* put it in right half — tweak % as needed */
+				transform: translate(-50%, -50%);
+				width: 70px;            /* fixed wrapper size matches disc */
+				height: 70px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				pointer-events: all;    /* allow clicks to pass to .disc only */
+				z-index: 10;             /* sit above the logo */
+			}
+		}
+
+	</style>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const disc = document.getElementById("disc");
+
+			// Array of MP3 URLs
+			const tracks = [
+					"music/softvibes.mp3",
+					"music/energy.mp3",
+					"music/doingdamage.mp3",
+					"music/moose.mp3",
+					"music/highoctane.mp3",
+			];
+
+			let currentIndex = 0;
+
+			// Load the first track
+			const audio = new Audio(tracks[currentIndex]);
+			audio.loop = false; // Loop handled manually if needed
+
+			// When current track ends, switch to next track
+			audio.addEventListener("ended", () => {
+				currentIndex = (currentIndex + 1) % tracks.length;
+				audio.src = tracks[currentIndex]; // load next track eagerly
+				audio.play().catch(() => console.log("Audio blocked"));
+			});
+
+			// First interaction starts audio & spinning
+			function startAudio() {
+				audio.play().catch(() => console.log("Audio blocked, needs interaction"));
+				disc.classList.add("rotating");
+				window.removeEventListener("click", startAudio);
+				window.removeEventListener("keydown", startAudio);
+			}
+
+			window.addEventListener("click", startAudio);
+			window.addEventListener("keydown", startAudio);
+
+			// Click disc to toggle pause/play
+			disc.addEventListener("click", () => {
+				if (audio.paused) {
+					audio.play().catch(() => console.log("Audio blocked"));
+					disc.classList.remove("paused");
+				} else {
+					audio.pause();
+					disc.classList.add("paused");
+				}
+			});
+		});
+	</script>
 
 
 
 </head>
 <body class="is-preload">
+
 
 <!-- Logo Overlay -->
 <div id="logo-bg-left"></div>
@@ -432,17 +552,21 @@
 	<div id="logo-right"></div>
 </div>
 
-<!-- Scrolling Banner Bar -->
+
 <div class="scrolling-banner">
-	<div class="banner-content">
-		
-		<a href="tel:+30 69 366 08 366" aria-label="">🚗 24/7 Οδική Βοήθεια – Καλέστε μας στο +30 69 366 08 366</a>
-		<span aria-label="instant availability">⚡ Άμεση ανταπόκριση σε όλη την Αττική</span>	
-		<span aria-label=""></span>
-
-	</div>
+	<ul>
+		<li>
+			<a href="tel:+30 69 366 08 366">🚗 24/7 Οδική Βοήθεια – Καλέστε μας στο +30 69 366 08 366</a>
+			<span>⚡ Άμεση ανταπόκριση σε όλη την Αττική</span>
+		</li>
+	</ul>
+	<ul aria-hidden="true">
+		<li>
+			<a href="tel:+30 69 366 08 366">🚗 24/7 Οδική Βοήθεια – Καλέστε μας στο +30 69 366 08 366</a>
+			<span>⚡ Άμεση ανταπόκριση σε όλη την Αττική</span>
+		</li>
+	</ul>
 </div>
-
 
 
 
@@ -453,12 +577,24 @@
 	<!-- Header -->
 	<header id="header">
 		<!--LOGO HERE-->
-		<div style="display:flex; justify-content:center; align-items:center; width:100%; text-align:center; margin:0 auto;">
+		<div class="logo-disc-container">
 			<img src="images/white_logo_result.webp"
 				 alt="Otto Assistance Logo"
-				 style="width:80%; max-width:350px; height:auto; border:1px solid white; border-radius:50px; opacity:0.75; display:block;"
+				 class="logo-img"
 				 draggable="false">
+			<div class="disc-wrapper" aria-hidden="false">
+				<div class="disc" id="disc" role="button" tabindex="0" aria-label="Play / Pause"></div>
+			</div>
 		</div>
+		
+		
+		
+		
+		
+
+
+
+
 		<div class="content">
 			<div class="inner">
 				<h1 style="font-family: Montserrat, serif">Η δική σας οδική βοήθεια</h1>
@@ -539,7 +675,6 @@
 						<video
 								src="/videos/v1.mp4"
 								poster="images/pic9_poster.webp"
-								muted
 								loop
 								controls
 								preload="none"
@@ -549,7 +684,6 @@
 						<video
 								src="/videos/v2.mp4"
 								poster="images/pic10_poster.webp"
-								muted
 								loop
 								controls
 								preload="none"
@@ -589,7 +723,7 @@
 								<li>Άμεση αλλαγή, επισκευή ελαστικών ή μεταφορά.</li>
 								<li>Άμεση αντικατάσταση, φόρτιση μπαταρίας και διαγνωστικός έλεγχος.</li>
 								<li>Βενζίνη ή πετρέλαιο γρήγορα στον τόπο ανάγκης.</li>
-								<li>Εξειδικευμένη βοήθεια διαθέσιμη οποιαδήποτε ώρα, χωρίς συμβόλαιο.</li>
+								<li>Εξειδικευμένη βοήθεια διαθέσιμη οποιαδήποτε ώρα, <br>  χωρίς συμβόλαιο.</li>
 								<li>Διαγνωστικός έλεγχος επιτόπου.</li>
 							</ul>
 						</div>
@@ -636,7 +770,7 @@
 
 				Η <strong>επαγγελματική μας ευθύνη</strong> για κάθε πελάτη ξεχωριστά.<br>
 
-				Υπόψιν: Μεταφορά για service οχημάτων κατόπιν συνεννοήσεως.
+				Υπόψιν: Μεταφορά για service οχημάτων κατόπιν συνεννοήσεως.<br>
 
 				Για οποιαδήποτε απορία καλέστε
 				<a href="tel:+30 69 366 08 366" style="color: #4285F4; font-weight:bold; text-decoration: underline;">
@@ -681,20 +815,18 @@
 						   onclick="gtag('event', 'conversion', {'send_to': 'AW-17536910218/vflwCLjSoqQbEIqHoKpB'});">
 							<i class="fab fa-tiktok"></i>
 						</a>
-
-						<a href="https://www.youtube.com/@OttoAssistance"
-						   target="_blank"
-						   style="color:#FF0000; font-size:32px;"
-						   onclick="gtag('event', 'conversion', {'send_to': 'AW-17536910218/vflwCLjSoqQbEIqHoKpB'});">
-							<i class="fab fa-youtube"></i>
-						</a>
-
 						<a href="https://www.linkedin.com/in/dimitris-kyrkylis-624081267/"
 						   target="_blank"
 						   style="color:#4285F4; font-size:32px;"
 						   onclick="gtag('event', 'conversion', {'send_to': 'AW-17536910218/vflwCLjSoqQbEIqHoKpB'});">
 							<i class="fab fa-linkedin"></i>
 						</a>
+						<a href="https://www.youtube.com/@OttoAssistance"
+							   target="_blank"
+							   style="color:#FF0000; font-size:32px;"
+							   onclick="gtag('event', 'conversion', {'send_to': 'AW-17536910218/vflwCLjSoqQbEIqHoKpB'});">
+						<i class="fab fa-youtube"></i>
+					</a>
 					</div>
 
 					<h3 style="margin-top:30px;">Email & Τηλέφωνο</h3>

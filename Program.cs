@@ -47,8 +47,8 @@ app.MapPost("/submit", async (HttpContext context) =>
         var clientMail = new MailMessage
         {
             From = new MailAddress("ottoassistance.info@gmail.com", "Otto Assistance"),
-            Subject = "Προσφορά",
-            Body = $"Γεια σου {name}!!\nΛάβε κωδικό: {promoCode} με έκπτωση 10% για να το χρησιμοποιήσεις για μεταφορά ή ασφαλιστική κάλυψη.",
+            Subject = "Προσφορά του μήνα!",
+            Body = $"Γεια σου {name}!!\nΛάβε κωδικό: {promoCode} με έκπτωση 10% για να το χρησιμοποιήσεις για μεταφορά ή ασφαλιστική κάλυψη.\n\nΣημείωση: ο κωδικός λήγει με το τέλος του μήνα",
             IsBodyHtml = false,
         };
         clientMail.To.Add(email);

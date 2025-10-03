@@ -23,6 +23,7 @@ section, summary, time, mark, audio, video {
 	border: 0;
 	font: inherit;	
 	font-size: 100%;
+	text-align: center;
 	vertical-align: baseline;
 	user-select: none; /* Standard syntax */
 	-webkit-user-select: none; /* Chrome, Safari, Opera */
@@ -58,6 +59,7 @@ table {
 
 body {
 	-webkit-text-size-adjust: none;
+	margin-top: 20px;
 }
 
 mark {
