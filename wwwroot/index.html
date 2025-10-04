@@ -95,17 +95,18 @@
 		.carousel-slide {
 			display: flex;
 			transition: transform 0.5s ease-in-out;
+			will-change: transform;
 		}
 
 		/* Individual Slides */
 		.carousel-slide img,
 		.carousel-slide video {
 			width: 100%;
-			height: auto;
-			max-height: 240px;
+			height: 230px;
 			flex-shrink: 0;
 			border-radius: 15px;
 			margin-right: 10px;
+			display: block;
 		}
 
 		/* Navigation Buttons */
@@ -122,15 +123,16 @@
 			width: 50px;
 			height: 50px;
 			cursor: pointer;
-			z-index: 10;
+			z-index: 9999; /* raised so clicks reach them reliably */
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			pointer-events: auto;
 		}
 
 		.carousel-container .prev:hover,
 		.carousel-container .next:hover {
-			background: rgba(0,0,0,0.2);
+			background: rgba(0, 0, 0, 0.2);
 		}
 
 		.carousel-container .prev {
@@ -140,67 +142,222 @@
 		.carousel-container .next {
 			right: 10px;
 		}
-		@media (max-width: 800px) {
-			.carousel-slide img ,
-			.carousel-slide video {
-				max-height: 50%;
-			}
-		}
 	</style>
 
 	<script>
-		function initCarousel(containerId, autoSlide = false) {
-			const carousel = document.getElementById(containerId);
-			const slideWrapper = carousel.querySelector('.carousel-slide');
-			const slides = Array.from(slideWrapper.children);
-			const prevBtn = carousel.querySelector('.prev');
-			const nextBtn = carousel.querySelector('.next');
-			let index = 0;
-
-			function getSlideWidth() {
-				const style = window.getComputedStyle(slides[0]);
-				const margin = parseFloat(style.marginRight);
-				return slides[0].offsetWidth + margin;
-			}
-
-			function moveToSlide(idx) {
-				const slideWidth = getSlideWidth();
-				slideWrapper.style.transform = `translateX(-${slideWidth * idx}px)`;
-			}
-
-			nextBtn.addEventListener('click', () => {
-				index = (index + 1) % slides.length;
-				moveToSlide(index);
-			});
-
-			prevBtn.addEventListener('click', () => {
-				index = (index - 1 + slides.length) % slides.length;
-				moveToSlide(index);
-			});
-
-			if (autoSlide) {
-
-				setInterval(() => {
-					index = (index + 1) % slides.length;
-					moveToSlide(index);
-				}, 5000); // 5 seconds
-			}
-
-			window.addEventListener('resize', () => moveToSlide(index));
-		}
-
-		// Initialize carousels
 		document.addEventListener('DOMContentLoaded', () => {
-			initCarousel('video-carousel', false);  // Videos: no auto-slide
-			initCarousel('photo-carousel', true);   // Photos: auto-slide every 5s
+			// --- Background audio setup ---
+			const disc = document.getElementById("disc");
+			const tracks = [
+				"music/softvibes.mp3",
+				"music/energy.mp3",
+				"music/doingdamage.mp3",
+				"music/moose.mp3",
+				"music/highoctane.mp3",
+			];
+			let currentIndex = 0;
+			const audio = new Audio(tracks[currentIndex]);
+			audio.loop = false;
+			let wasPlayingBeforeVideo = false;
+
+			audio.addEventListener("ended", () => {
+				currentIndex = (currentIndex + 1) % tracks.length;
+				audio.src = tracks[currentIndex];
+				audio.play().catch(() => {});
+			});
+
+			function startAudio() {
+				audio.play().catch(() => {});
+				disc.classList.add("rotating");
+				window.removeEventListener("click", startAudio);
+				window.removeEventListener("keydown", startAudio);
+			}
+			window.addEventListener("click", startAudio);
+			window.addEventListener("keydown", startAudio);
+
+			disc.addEventListener("click", () => {
+				if (audio.paused) {
+					audio.play().catch(() => {});
+					disc.classList.remove("paused");
+				} else {
+					audio.pause();
+					disc.classList.add("paused");
+				}
+			});
+
+			// Handle video play/pause logic
+			const videos = document.querySelectorAll("video");
+			videos.forEach(video => {
+				video.addEventListener("play", () => {
+					if (!audio.paused) {
+						wasPlayingBeforeVideo = true;
+						audio.pause();
+						disc.classList.add("paused");
+					} else {
+						wasPlayingBeforeVideo = false;
+					}
+				});
+
+				video.addEventListener("pause", () => {
+					if (wasPlayingBeforeVideo) {
+						audio.play().catch(() => {});
+						disc.classList.remove("paused");
+					}
+				});
+
+				video.addEventListener("ended", () => {
+					if (wasPlayingBeforeVideo) {
+						audio.play().catch(() => {});
+						disc.classList.remove("paused");
+					}
+				});
+			});
+
+			// --- Carousel setup ---
+			const configs = [
+				{ id: 'photo-carousel', autoSlide: true, showButtons: false },
+				{ id: 'video-carousel', autoSlide: false, showButtons: true }
+			];
+
+			configs.forEach(cfg => {
+				const carousel = document.getElementById(cfg.id);
+				if (!carousel) return;
+
+				const slideWrapper = carousel.querySelector('.carousel-slide');
+				if (!slideWrapper) return;
+
+				const slides = Array.from(slideWrapper.children);
+				if (!slides.length) return;
+
+				let index = 0;
+				let autoInterval = null;
+
+				function computeSlideWidth() {
+					// Take the first fully loaded slide
+					for (let slide of slides) {
+						const img = slide.querySelector("img");
+						if (!img || img.complete) {
+							const rect = slide.getBoundingClientRect();
+							const style = window.getComputedStyle(slide);
+							const margin = parseFloat(style.marginRight) || 0;
+							return Math.round(rect.width + margin);
+						}
+					}
+					return 0; // fallback if nothing loaded
+				}
+
+
+				function moveToSlide(idx) {
+					const w = computeSlideWidth();
+
+					// Only move if width is known (non-zero)
+					if (w > 0) {
+						slideWrapper.style.transform = `translateX(-${w * idx}px)`;
+					} else {
+						// Wait a bit and try again if first image isn’t ready
+						setTimeout(() => moveToSlide(idx), 50);
+					}
+				}
+
+
+				const prevBtn = carousel.querySelector('.prev');
+				const nextBtn = carousel.querySelector('.next');
+
+				if (!cfg.showButtons) {
+					if (prevBtn) prevBtn.remove();
+					if (nextBtn) nextBtn.remove();
+				} else {
+					if (nextBtn) {
+						nextBtn.addEventListener('click', (e) => {
+							e.preventDefault();
+							index = (index + 1) % slides.length;
+							moveToSlide(index);
+
+							// --- Pause any playing videos on Next ---
+							videos.forEach(video => {
+								if (!video.paused) video.pause();
+							});
+
+							// Ensure background music is playing
+							if (audio.paused) {
+								audio.play().catch(() => {});
+								disc.classList.remove("paused");
+							}
+						});
+					}
+
+					if (prevBtn) {
+						prevBtn.addEventListener('click', (e) => {
+							e.preventDefault();
+							index = (index - 1 + slides.length) % slides.length;
+							moveToSlide(index);
+
+							// Pause videos & play music as well
+							videos.forEach(video => {
+								if (!video.paused) video.pause();
+							});
+							if (audio.paused) {
+								audio.play().catch(() => {});
+								disc.classList.remove("paused");
+							}
+						});
+					}
+				}
+
+				function startAuto() {
+					if (cfg.autoSlide && !autoInterval) {
+						autoInterval = setInterval(() => {
+							index = (index + 1) % slides.length;
+							moveToSlide(index);
+						}, 5000);
+					}
+				}
+
+				function stopAuto() {
+					if (autoInterval) {
+						clearInterval(autoInterval);
+						autoInterval = null;
+					}
+				}
+
+				if (cfg.autoSlide) {
+					startAuto();
+					carousel.addEventListener('mouseenter', stopAuto);
+					carousel.addEventListener('mouseleave', startAuto);
+				}
+
+				window.addEventListener('resize', () => {
+					setTimeout(() => moveToSlide(index), 50);
+				});
+
+				function ensureInitialLayout() {
+					moveToSlide(0);
+				}
+
+				const firstMedia = slides[0].querySelector('img, video');
+				if (firstMedia) {
+					if (firstMedia.tagName === 'IMG') {
+						if (firstMedia.complete) ensureInitialLayout();
+						else firstMedia.addEventListener('load', ensureInitialLayout);
+					} else if (firstMedia.tagName === 'VIDEO') {
+						if (firstMedia.readyState >= 1) ensureInitialLayout();
+						else firstMedia.addEventListener('loadedmetadata', ensureInitialLayout);
+					} else {
+						ensureInitialLayout();
+					}
+				} else {
+					ensureInitialLayout();
+				}
+			});
 		});
 	</script>
 
 
 
 
-	
-	
+
+
+
 	<!-- Logo Overlay CSS -->
 	<style>
 		/* Left and right halves of black background */
@@ -448,28 +605,48 @@
 			pointer-events: all;    /* allow clicks to pass to .disc only */
 			z-index: 10;             /* sit above the logo */
 		}
-		.disc{
+		.disc {
 			width: inherit;
 			height: inherit;
-			background: url(https://moytek.com.tr/wp-content/uploads/disk-hover-effect/s-l1200.png) center;
-		
-			background-size:400px;
 			border-radius: 50%;
-			transition: all 1s;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			position: relative;
-			z-index: 100000;
-			
-		} .rotating {
-			  animation: rotation 5s linear infinite;
-		  } 
-		.paused {
-				animation-play-state: paused;
-			}
+		}
 
-		/* Rotate Animation Keyframes */
+		.disc-rotate {
+			width: 100%;
+			height: 100%;
+			border-radius: 50%;
+		}
+
+		.disc-inner {
+			width: 100%;
+			height: 100%;
+			background: url(https://moytek.com.tr/wp-content/uploads/disk-hover-effect/s-l1200.png) center;
+			background-size: 400px;
+			border-radius: 50%;
+			transition: transform 0.3s ease;
+		}
+
+		.disc-inner:hover {
+			transform: scale(1.4) ;
+			
+		}
+
+		/* Rotation applied to the wrapper */
+		.rotating .disc-rotate {
+			animation: rotation 5s linear infinite;
+		}
+
+		.paused .disc-rotate {
+			animation-play-state: paused;
+		}
+
 		@keyframes rotation {
-			from {transform: rotate(0deg);}
-			to {transform: rotate(360deg);}
+			from { transform: rotate(0deg); }
+			to { transform: rotate(360deg); }
 		}
 		@media (max-width: 800px) {
 			.disc-wrapper {
@@ -477,8 +654,8 @@
 				top: 40%;
 				left: 80%;               /* put it in right half — tweak % as needed */
 				transform: translate(-50%, -50%);
-				width: 70px;            /* fixed wrapper size matches disc */
-				height: 70px;
+				width: 45px;            /* fixed wrapper size matches disc */
+				height: 45px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -492,31 +669,28 @@
 		document.addEventListener("DOMContentLoaded", () => {
 			const disc = document.getElementById("disc");
 
-			// Array of MP3 URLs
 			const tracks = [
-					"music/softvibes.mp3",
-					"music/energy.mp3",
-					"music/doingdamage.mp3",
-					"music/moose.mp3",
-					"music/highoctane.mp3",
+				"music/softvibes.mp3",
+				"music/energy.mp3",
+				"music/doingdamage.mp3",
+				"music/moose.mp3",
+				"music/highoctane.mp3",
 			];
 
 			let currentIndex = 0;
-
-			// Load the first track
 			const audio = new Audio(tracks[currentIndex]);
-			audio.loop = false; // Loop handled manually if needed
+			audio.loop = false;
 
-			// When current track ends, switch to next track
+			let wasPlayingBeforeVideo = false;
+
 			audio.addEventListener("ended", () => {
 				currentIndex = (currentIndex + 1) % tracks.length;
-				audio.src = tracks[currentIndex]; // load next track eagerly
-				audio.play().catch(() => console.log("Audio blocked"));
+				audio.src = tracks[currentIndex];
+				audio.play().catch(() => {});
 			});
 
-			// First interaction starts audio & spinning
 			function startAudio() {
-				audio.play().catch(() => console.log("Audio blocked, needs interaction"));
+				audio.play().catch(() => {});
 				disc.classList.add("rotating");
 				window.removeEventListener("click", startAudio);
 				window.removeEventListener("keydown", startAudio);
@@ -525,18 +699,47 @@
 			window.addEventListener("click", startAudio);
 			window.addEventListener("keydown", startAudio);
 
-			// Click disc to toggle pause/play
 			disc.addEventListener("click", () => {
 				if (audio.paused) {
-					audio.play().catch(() => console.log("Audio blocked"));
+					audio.play().catch(() => {});
 					disc.classList.remove("paused");
 				} else {
 					audio.pause();
 					disc.classList.add("paused");
 				}
 			});
+
+			/* --- NEW: handle video play/pause logic --- */
+			const videos = document.querySelectorAll("video");
+
+			videos.forEach(video => {
+				video.addEventListener("play", () => {
+					if (!audio.paused) {
+						wasPlayingBeforeVideo = true;
+						audio.pause();
+						disc.classList.add("paused");
+					} else {
+						wasPlayingBeforeVideo = false;
+					}
+				});
+
+				video.addEventListener("pause", () => {
+					if (wasPlayingBeforeVideo) {
+						audio.play().catch(() => {});
+						disc.classList.remove("paused");
+					}
+				});
+
+				video.addEventListener("ended", () => {
+					if (wasPlayingBeforeVideo) {
+						audio.play().catch(() => {});
+						disc.classList.remove("paused");
+					}
+				});
+			});
 		});
 	</script>
+
 
 
 
@@ -582,8 +785,12 @@
 				 alt="Otto Assistance Logo"
 				 class="logo-img"
 				 draggable="false">
-			<div class="disc-wrapper" aria-hidden="false">
-				<div class="disc" id="disc" role="button" tabindex="0" aria-label="Play / Pause"></div>
+			<div class="disc-wrapper">
+				<div class="disc" id="disc">
+					<div class="disc-rotate">
+						<div class="disc-inner"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 		
@@ -607,8 +814,8 @@
 			<ul>
 				<!-- Change padding and margins SOS-->
 				<li><a href="#about" >Εμείς</a></li>
-				<li><a href="#intro">Gallery</a></li>
-				<li><a href="#work">Υπηρεσίες</a></li>
+				<li><a href="#gallery">Gallery</a></li>
+				<li><a href="#services">Υπηρεσίες</a></li>
 				<li><a href="#contact">Επικοινωνία</a></li>
 			</ul>
 		</nav>
@@ -616,59 +823,82 @@
 
 	<!-- Main -->
 	<div id="main">
-		<!-- Intro -->
-		<article id="intro">
+
+		<!-- About -->
+		<article id="about" style="text-align: center;">
+			<h2 class="major">Εμείς</h2>
+			<div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+				<img src="images/logo_withlines.webp"
+					 alt="Otto Assistance logo"
+					 style="max-width: 100%; max-height: 175px; border:0.5px solid grey; border-radius: 0.25rem;" />
+			</div>
+			<p style="font-size: 1.1rem; line-height: 1.6;font-family:'roboto',sans-serif;">
+				Η <strong>Otto Assistance</strong> διαθέτει τεχνική υποστήριξη,
+				<strong>άμεση</strong> και αποτελεσματική εξυπηρέτηση για την
+				ασφαλή μεταφορά παντός τύπου οχήματος.
+
+				Η <strong>επαγγελματική μας ευθύνη</strong> για κάθε πελάτη ξεχωριστά.<br>
+
+				Υπόψιν: Μεταφορά για service οχημάτων κατόπιν συνεννοήσεως.<br>
+
+				Για οποιαδήποτε απορία καλέστε
+				<a href="tel:+30 69 366 08 366" style="color: #4285F4; font-weight:bold; text-decoration: underline;">
+					69 366 08 366
+				</a>.<br>
+			</p>
+
+		</article>
+		
+		
+		<!-- gallery -->
+		<article id="gallery">
 			<h2 class="major" style="text-align: center;">Gallery</h2>
 			<!-- Photo Carousel -->
-			<div class="carousel-wrapper" >
-				<h3 style="text-align:center;" aria-label="photos">Φωτογραφίες</h3>
-				<div class="carousel-container" id="photo-carousel">
-					<div class="carousel-slide">
-						<img loading="lazy" src="images/pic8_result.webp" alt="Image 8">
-						<img loading="lazy" src="images/pic10_result.webp" alt="Image 10">
-						<img loading="lazy" src="images/pic11_result.webp" alt="Image 11">
-						<img loading="lazy" src="images/pic13_result.webp" alt="Image 13">
-						<img loading="lazy" src="images/pic14_result.webp" alt="Image 14">
-						<img loading="lazy" src="images/pic15_result.webp" alt="Image 15">
-						<img loading="lazy" src="images/pic16_result.webp" alt="Image 16">
-						<img loading="lazy" src="images/pic17_result.webp" alt="Image 17">
-						<img loading="lazy" src="images/pic18_result.webp" alt="Image 18">
-						<img loading="lazy" src="images/pic19_result.webp" alt="Image 19">
-						<img loading="lazy" src="images/pic20_result.webp" alt="Image 20">
-						<img loading="lazy" src="images/pic21_result.webp" alt="Image 21">
-						<img loading="lazy" src="images/pic22_result.webp" alt="Image 22">
-						<img loading="lazy" src="images/pic23_result.webp" alt="Image 23">
-						<img loading="lazy" src="images/pic24_result.webp" alt="Image 24">
-						<img loading="lazy" src="images/pic25_result.webp" alt="Image 25">
-						<img loading="lazy" src="images/pic26_result.webp" alt="Image 26">
-						<img loading="lazy" src="images/pic27_result.webp" alt="Image 27">
-						<img loading="lazy" src="images/pic28_result.webp" alt="Image 28">
-						<img loading="lazy" src="images/pic29_result.webp" alt="Image 29">
-						<img loading="lazy" src="images/pic30_result.webp" alt="Image 30">
-						<img loading="lazy" src="images/pic31_result.webp" alt="Image 31">
-						<img loading="lazy" src="images/pic32_result.webp" alt="Image 32">
-						<img loading="lazy" src="images/pic33_result.webp" alt="Image 33">
-						<img loading="lazy" src="images/pic34_result.webp" alt="Image 34">
-						<img loading="lazy" src="images/pic35_result.webp" alt="Image 35">
-						<img loading="lazy" src="images/pic36_result.webp" alt="Image 36">
-						<img loading="lazy" src="images/pic37_result.webp" alt="Image 37">
-						<img loading="lazy" src="images/pic38_result.webp" alt="Image 38">
-						<img loading="lazy" src="images/pic39_result.webp" alt="Image 39">
-						<img loading="lazy" src="images/pic40_result.webp" alt="Image 40">
-						<img loading="lazy" src="images/pic41_result.webp" alt="Image 41">
-						<img loading="lazy" src="images/pic42_result.webp" alt="Image 42">
-						<img loading="lazy" src="images/pic43_result.webp" alt="Image 43">
-						<img loading="lazy" src="images/pic44_result.webp" alt="Image 44">
-						<img loading="lazy" src="images/pic45_result.webp" alt="Image 45">
+			<h3 style="text-align:center;" aria-label="photos">Φωτογραφίες</h3>
+			<div class="carousel-container" id="photo-carousel">
+				<div class="carousel-slide">
+					<img loading="lazy" src="images/pic8_result.webp" alt="Image 8" draggable="false">
+					<img loading="lazy" src="images/pic10_result.webp" alt="Image 10" draggable="false">
+					<img loading="lazy" src="images/pic11_result.webp" alt="Image 11" draggable="false">
+					<img loading="lazy" src="images/pic13_result.webp" alt="Image 13" draggable="false">
+					<img loading="lazy" src="images/pic14_result.webp" alt="Image 14" draggable="false">
+					<img loading="lazy" src="images/pic15_result.webp" alt="Image 15" draggable="false">
+					<img loading="lazy" src="images/pic16_result.webp" alt="Image 16" draggable="false">
+					<img loading="lazy" src="images/pic17_result.webp" alt="Image 17" draggable="false">
+					<img loading="lazy" src="images/pic18_result.webp" alt="Image 18" draggable="false">
+					<img loading="lazy" src="images/pic19_result.webp" alt="Image 19" draggable="false">
+					<img loading="lazy" src="images/pic20_result.webp" alt="Image 20" draggable="false">
+					<img loading="lazy" src="images/pic21_result.webp" alt="Image 21" draggable="false">
+					<img loading="lazy" src="images/pic22_result.webp" alt="Image 22" draggable="false">
+					<img loading="lazy" src="images/pic23_result.webp" alt="Image 23" draggable="false">
+					<img loading="lazy" src="images/pic24_result.webp" alt="Image 24" draggable="false">
+					<img loading="lazy" src="images/pic25_result.webp" alt="Image 25" draggable="false">
+					<img loading="lazy" src="images/pic26_result.webp" alt="Image 26" draggable="false">
+					<img loading="lazy" src="images/pic27_result.webp" alt="Image 27" draggable="false">
+					<img loading="lazy" src="images/pic28_result.webp" alt="Image 28" draggable="false">
+					<img loading="lazy" src="images/pic29_result.webp" alt="Image 29" draggable="false">
+					<img loading="lazy" src="images/pic30_result.webp" alt="Image 30" draggable="false">
+					<img loading="lazy" src="images/pic31_result.webp" alt="Image 31" draggable="false">
+					<img loading="lazy" src="images/pic32_result.webp" alt="Image 32" draggable="false">
+					<img loading="lazy" src="images/pic33_result.webp" alt="Image 33" draggable="false">
+					<img loading="lazy" src="images/pic34_result.webp" alt="Image 34" draggable="false">
+					<img loading="lazy" src="images/pic35_result.webp" alt="Image 35" draggable="false">
+					<img loading="lazy" src="images/pic36_result.webp" alt="Image 36" draggable="false">
+					<img loading="lazy" src="images/pic37_result.webp" alt="Image 37" draggable="false">
+					<img loading="lazy" src="images/pic38_result.webp" alt="Image 38" draggable="false">
+					<img loading="lazy" src="images/pic39_result.webp" alt="Image 39" draggable="false">
+					<img loading="lazy" src="images/pic40_result.webp" alt="Image 40" draggable="false">
+					<img loading="lazy" src="images/pic41_result.webp" alt="Image 41" draggable="false">
+					<img loading="lazy" src="images/pic42_result.webp" alt="Image 42" draggable="false">
+					<img loading="lazy" src="images/pic43_result.webp" alt="Image 43" draggable="false">
+					<img loading="lazy" src="images/pic44_result.webp" alt="Image 44" draggable="false">
+					<img loading="lazy" src="images/pic45_result.webp" alt="Image 45" draggable="false">
 
-					</div>
-					<!-- Navigation -->
-					<button class="prev">&#10094;</button>
-					<button class="next">&#10095;</button>
 				</div>
+	
 			</div>
 			<!-- Video Carousel -->
-			<div class="carousel-wrapper" style="margin-top:40px;">
+			<div style="margin-top:30px;">
 				<h3 style="text-align:center;" aria-label="video">Βίντεο</h3>
 				<div class="carousel-container" id="video-carousel">
 					<div class="carousel-slide">
@@ -699,17 +929,8 @@
 
 		</article>
 
-
-
-
-
-
-
-
-
-
-		<!-- Work -->
-		<article id="work" class="container py-5">
+		<!-- Services -->
+		<article id="services" class="container py-5">
 			<h2 class="text-center mb-5 text-primary">Υπηρεσίες Οδικής Βοήθειας</h2>
 
 			<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
@@ -741,13 +962,13 @@
 			<h2 class="major">Προσφορά</h2>
 			<form id="offerForm" style="text-align: center;">
 				<label for="name" style="font-size:1rem;">Ονομ/νυμο</label>
-				<input id="name" type="text" name="name" placeholder="Εισάγετε ονομ/νυμο εδώ"  required style="width: 50%; margin: 0 auto; display: block;">
+				<input id="name" type="text" name="name" placeholder="Εισάγετε ονομ/νυμο"  required style="width: 50%; margin: 0 auto; display: block;">
 
 				<label for="email" style="margin-top:1.5rem; font-size:1rem;">Email</label>
-				<input id="email" type="email" name="email" placeholder="Εισάγετε email εδώ"  required >
+				<input id="email" type="email" name="email" placeholder="Εισάγετε email"  required >
 
 				<label for="phone" style="margin-top:1.5rem;font-size:1rem;">Κινητό Τηλέφωνο</label>
-				<input id="phone" type="tel" name="phone" placeholder="Εισάγετε κινητό τηλέφωνο εδώ"  required >
+				<input id="phone" type="tel" name="phone" placeholder="Εισάγετε κινητό"  required >
 
 				<button type="submit" style="margin-top: 1.5rem;font-size:1rem;">Αποστολή</button>
 			</form>
@@ -755,30 +976,7 @@
 
 
 
-		<!-- About -->
-		<article id="about" style="text-align: center;">
-			<h2 class="major">Εμείς</h2>
-			<div style="display: flex; justify-content: center; margin-bottom: 1rem;">
-				<img src="images/logo_withlines.webp"
-					 alt="Otto Assistance logo"
-					 style="max-width: 100%; max-height: 175px; border:0.5px solid grey; border-radius: 0.25rem;" />
-			</div>
-			<p style="font-size: 1.1rem; line-height: 1.6;font-family:'roboto',sans-serif;text-shadow: 0 0 2px rgba(0,0,0,0.2);">
-				Η <strong>Otto Assistance</strong> διαθέτει τεχνική υποστήριξη,
-				<strong>άμεση</strong> και αποτελεσματική εξυπηρέτηση για την
-				ασφαλή μεταφορά παντός τύπου οχήματος.
-
-				Η <strong>επαγγελματική μας ευθύνη</strong> για κάθε πελάτη ξεχωριστά.<br>
-
-				Υπόψιν: Μεταφορά για service οχημάτων κατόπιν συνεννοήσεως.<br>
-
-				Για οποιαδήποτε απορία καλέστε
-				<a href="tel:+30 69 366 08 366" style="color: #4285F4; font-weight:bold; text-decoration: underline;">
-					69 366 08 366
-				</a>.<br>
-			</p>
-
-		</article>
+		
 
 		<article id="contact">
 			<h2 class="major" style="text-align:center; margin-bottom:30px;">Επικοινωνία</h2>
