@@ -142,7 +142,7 @@
 		.carousel-container .next {
 			right: 10px;
 		}
-		@media screen and (max-width: 800px){
+		@media screen and (max-width: 1024px){
 			.carousel-container {
 				max-width: 100%;
 			}
@@ -354,6 +354,23 @@
 					ensureInitialLayout();
 				}
 			});
+			const gallery = document.getElementById("gallery");
+			// Create an Intersection Observer
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (!entry.isIntersecting) {
+						// Pause all videos when gallery is out of view
+						videos.forEach(video => {
+							if (!video.paused) {
+								video.pause();
+							}
+						});
+					}
+				});
+			}, { threshold: 0.1 }); // triggers when at least 10% of gallery is visible
+
+			observer.observe(gallery);
+			
 		});
 	</script>
 
