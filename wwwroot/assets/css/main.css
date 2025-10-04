@@ -37,7 +37,7 @@ footer, header, hgroup, menu, nav, section {
 
 body {
 	line-height: 1;
-	margin-top:20px;
+	margin-top:30px;
 }
 
 ol, ul {
@@ -60,7 +60,7 @@ table {
 
 body {
 	-webkit-text-size-adjust: none;
-
+	margin-top:20px;
 }
 
 mark {
@@ -90,7 +90,7 @@ input, select, textarea {
 
 		html, body {
 			min-width: 320px;
-			margin-top:20px;
+			margin-top:30px;
 		}
 
 	}
@@ -268,7 +268,7 @@ input, select, textarea {
 	code {
 		background: rgba(255, 255, 255, 0.075);
 		border-radius: 4px;
-		font-family: "Courier New", sans-serif;
+		font-family: "Courier New", monospace;
 		font-size: 0.9rem;
 		margin: 0 0.25rem;
 		padding: 0.25rem 0.65rem;
@@ -276,7 +276,7 @@ input, select, textarea {
 
 	pre {
 		-webkit-overflow-scrolling: touch;
-		font-family: "Courier New", sans-serif;
+		font-family: "Courier New", monospace;
 		font-size: 0.9rem;
 		margin: 0 0 2rem 0;
 	}
@@ -1274,6 +1274,7 @@ input, select, textarea {
 		background-image: radial-gradient(rgba(0, 0, 0, 0.25) 25%, rgba(0, 0, 0, 0) 55%);
 		max-width: 100%;
 		text-align: center;
+
 	}
 
 		#header > * {
@@ -1282,17 +1283,17 @@ input, select, textarea {
 			-ms-transition: opacity 0.325s ease-in-out;
 			transition: opacity 0.325s ease-in-out;
 			position: relative;
-			margin-top: 20px;
+			margin-top: 2rem;
 		}
 
 			#header > *:before {
 				content: '';
 				display: block;
 				position: absolute;
-				top: calc(-3.5rem - 1px);
+				top: -2rem;
 				left: calc(50% - 1px);
 				width: 1px;
-				height: calc(3.5rem + 1px);
+				height: calc(2rem);
 				background: #ffffff;
 			}
 
@@ -1439,18 +1440,26 @@ input, select, textarea {
 			}
 
 		}
-
+		@media screen and (max-width: 1024px) {
+			#header > *:before {
+				top: calc(-2rem);
+				height: calc(2rem);
+			}
+		}
 		@media screen and (max-width: 736px) {
 
 			#header > * {
 				margin-top: 20px;
 			}
-
-				#header > *:before {
-					top: calc(-2rem - 1px);
-					height: calc(2rem + 1px);
-				}
-
+			
+			#header > *:before {
+				top: calc(-1.5rem + 1px);
+				height: calc(1.5rem);
+			}
+			#header > *:before:first-child {
+				top: calc(-1.5rem);
+				height: calc(1.5rem);
+			}
 			#header .logo {
 				width: 4.75rem;
 				height: 4.75rem;
