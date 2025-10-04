@@ -151,7 +151,7 @@
 	</style>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', () => {
+		document.addEventListener("DOMContentLoaded", () => {
 			// --- Background audio setup ---
 			const disc = document.getElementById("disc");
 			const tracks = [
@@ -191,7 +191,7 @@
 				}
 			});
 
-			// Handle video play/pause logic
+			// --- Video interaction logic ---
 			const videos = document.querySelectorAll("video");
 			videos.forEach(video => {
 				video.addEventListener("play", () => {
@@ -239,7 +239,6 @@
 				let autoInterval = null;
 
 				function computeSlideWidth() {
-					// Take the first fully loaded slide
 					for (let slide of slides) {
 						const img = slide.querySelector("img");
 						if (!img || img.complete) {
@@ -249,22 +248,17 @@
 							return Math.round(rect.width + margin);
 						}
 					}
-					return 0; // fallback if nothing loaded
+					return 0;
 				}
-
 
 				function moveToSlide(idx) {
 					const w = computeSlideWidth();
-
-					// Only move if width is known (non-zero)
 					if (w > 0) {
 						slideWrapper.style.transform = `translateX(-${w * idx}px)`;
 					} else {
-						// Wait a bit and try again if first image isn’t ready
 						setTimeout(() => moveToSlide(idx), 50);
 					}
 				}
-
 
 				const prevBtn = carousel.querySelector('.prev');
 				const nextBtn = carousel.querySelector('.next');
@@ -278,17 +272,8 @@
 							e.preventDefault();
 							index = (index + 1) % slides.length;
 							moveToSlide(index);
-
-							// --- Pause any playing videos on Next ---
-							videos.forEach(video => {
-								if (!video.paused) video.pause();
-							});
-
-							// Ensure background music is playing
-							if (audio.paused) {
-								audio.play().catch(() => {});
-								disc.classList.remove("paused");
-							}
+							videos.forEach(video => { if (!video.paused) video.pause(); });
+							if (audio.paused) { audio.play().catch(() => {}); disc.classList.remove("paused"); }
 						});
 					}
 
@@ -297,15 +282,8 @@
 							e.preventDefault();
 							index = (index - 1 + slides.length) % slides.length;
 							moveToSlide(index);
-
-							// Pause videos & play music as well
-							videos.forEach(video => {
-								if (!video.paused) video.pause();
-							});
-							if (audio.paused) {
-								audio.play().catch(() => {});
-								disc.classList.remove("paused");
-							}
+							videos.forEach(video => { if (!video.paused) video.pause(); });
+							if (audio.paused) { audio.play().catch(() => {}); disc.classList.remove("paused"); }
 						});
 					}
 				}
@@ -320,10 +298,7 @@
 				}
 
 				function stopAuto() {
-					if (autoInterval) {
-						clearInterval(autoInterval);
-						autoInterval = null;
-					}
+					if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
 				}
 
 				if (cfg.autoSlide) {
@@ -348,30 +323,22 @@
 					} else if (firstMedia.tagName === 'VIDEO') {
 						if (firstMedia.readyState >= 1) ensureInitialLayout();
 						else firstMedia.addEventListener('loadedmetadata', ensureInitialLayout);
-					} else {
-						ensureInitialLayout();
-					}
-				} else {
-					ensureInitialLayout();
-				}
+					} else ensureInitialLayout();
+				} else ensureInitialLayout();
 			});
-			const gallery = document.getElementById("gallery");
-			// Create an Intersection Observer
-			const observer = new IntersectionObserver((entries) => {
-				entries.forEach(entry => {
-					if (!entry.isIntersecting) {
-						// Pause all videos when gallery is out of view
-						videos.forEach(video => {
-							if (!video.paused) {
-								video.pause();
-							}
-						});
-					}
-				});
-			}, { threshold: 0.1 }); // triggers when at least 10% of gallery is visible
 
-			observer.observe(gallery);
-			
+			// --- Pause videos when gallery is out of view ---
+			const gallery = document.getElementById("gallery");
+			if (gallery) {
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach(entry => {
+						if (!entry.isIntersecting) {
+							videos.forEach(video => { if (!video.paused) video.pause(); });
+						}
+					});
+				}, { threshold: 0.1 });
+				observer.observe(gallery);
+			}
 		});
 	</script>
 
@@ -688,85 +655,13 @@
 		}
 
 	</style>
-	<script>
-		document.addEventListener("DOMContentLoaded", () => {
-			const disc = document.getElementById("disc");
-
-			const tracks = [
-				"music/softvibes.mp3",
-				"music/energy.mp3",
-				"music/doingdamage.mp3",
-				"music/moose.mp3",
-				"music/highoctane.mp3",
-			];
-
-			let currentIndex = 0;
-			const audio = new Audio(tracks[currentIndex]);
-			audio.loop = false;
-
-			let wasPlayingBeforeVideo = false;
-
-			audio.addEventListener("ended", () => {
-				currentIndex = (currentIndex + 1) % tracks.length;
-				audio.src = tracks[currentIndex];
-				audio.play().catch(() => {});
-			});
-
-			function startAudio() {
-				audio.play().catch(() => {});
-				disc.classList.add("rotating");
-				window.removeEventListener("click", startAudio);
-				window.removeEventListener("keydown", startAudio);
-			}
-
-			window.addEventListener("click", startAudio);
-			window.addEventListener("keydown", startAudio);
-
-			disc.addEventListener("click", () => {
-				if (audio.paused) {
-					audio.play().catch(() => {});
-					disc.classList.remove("paused");
-				} else {
-					audio.pause();
-					disc.classList.add("paused");
-				}
-			});
-
-			/* --- NEW: handle video play/pause logic --- */
-			const videos = document.querySelectorAll("video");
-
-			videos.forEach(video => {
-				video.addEventListener("play", () => {
-					if (!audio.paused) {
-						wasPlayingBeforeVideo = true;
-						audio.pause();
-						disc.classList.add("paused");
-					} else {
-						wasPlayingBeforeVideo = false;
-					}
-				});
-
-				video.addEventListener("pause", () => {
-					if (wasPlayingBeforeVideo) {
-						audio.play().catch(() => {});
-						disc.classList.remove("paused");
-					}
-				});
-
-				video.addEventListener("ended", () => {
-					if (wasPlayingBeforeVideo) {
-						audio.play().catch(() => {});
-						disc.classList.remove("paused");
-					}
-				});
-			});
-		});
-	</script>
+	
 
 
 
 
 </head>
+
 <body class="is-preload">
 
 
